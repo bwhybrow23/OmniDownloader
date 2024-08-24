@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniDownloader</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <%- include('Partials/header') %>
+
+  <main>
+    <section class="dashboard">
+      <h2>Current Downloads</h2>
+      <div class="downloads">
+        <% downloads.forEach(function(download) { %>
+          <div class="download-item">
+            <h3><%= download.profileName %></h3>
+            <p>Content Type: <%= download.contentType %></p>
+            <p>Status: <span class="<%= download.status.toLowerCase() %>"><%= download.status %></span></p>
+          </div>
+        <% }); %>
+      </div>
+  
+      <div class="quick-actions">
+        <button onclick="downloadAll()">Download All Content</button>
+        <button onclick="window.location.href='/profiles'">Manage Profiles</button>
+      </div>
+  
+      <div class="recent-activity">
+        <h2>Recent Activity</h2>
+        <ul>
+          <% recentActivities.forEach(function(activity) { %>
+            <li><%= activity.message %> - <%= activity.time %></li>
+          <% }); %>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <%- include('Partials/footer') %>
+  
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!-- Add Profile Form -->
+<section class="profile-form" id="addProfileForm" style="display: none;">
+  <h2>Add New Profile</h2>
+  <form action="/profiles/add" method="POST">
+    <label for="platform">Platform:</label>
+    <select id="platform" name="platform" onchange="handlePlatformChange()" required>
+      <option value="fansly">Fansly</option>
+      <option value="onlyfans">OnlyFans</option>
+      <option value="candfans">CandFans</option>
+    </select>
+
+    <label for="user_id">User ID:</label>
+    <input type="text" id="user_id" name="user_id" required>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="media_type">Type of Media:</label>
+    <select id="media_type" name="media_type">
+      <option value="all">All</option>
+      <option value="photos">Photos</option>
+      <option value="videos">Videos</option>
+    </select>
+
+    <button type="submit">Add Profile</button>
+    <button type="button" onclick="closeForm('addProfileForm')">Cancel</button>
+  </form>
+</section>
+
+<script>
+  function handlePlatformChange() {
+    const platform = document.getElementById('platform').value;
+    const usernameField = document.getElementById('username');
+    
+    if (platform === 'fansly') {
+      usernameField.required = true;
+      usernameField.removeAttribute('disabled');
+    } else {
+      usernameField.required = false;
+      usernameField.setAttribute('disabled', true);
+      usernameField.value = document.getElementById('user_id').value;
+    }
+  }
+
+  function closeForm(formId) {
+    document.getElementById(formId).style.display = 'none';
+  }
+
+  function addProfile() {
+    document.getElementById('addProfileForm').style.display = 'block';
+  }
+</script>

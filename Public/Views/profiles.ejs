@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniDownloader</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <%- include('Partials/header') %>
+  <main>
+    <section class="profiles">
+      <h2>Manage Profiles</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">Profile Username</th>
+            <th style="width: 20%;">User ID</th>
+            <th style="width: 20%;">Platform</th>
+            <th style="width: 20%;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% watchlist.forEach(function(profile) { %>
+            <tr>
+              <td><%= profile.username %></td>
+              <td><%= profile.user_id %></td>
+              <td><%= profile.platform %></td>
+              <td class="action-buttons">
+                <button onclick="editProfile('<%= profile.user_id %>')">Edit</button>
+                <button onclick="confirmDeleteProfile('<%= profile.user_id %>')">Delete</button>
+                <button onclick="promptDownload('<%= profile.user_id %>')">Download</button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <button onclick="addProfile()">Add New Profile</button>
+    </section>
+    
+    <!-- Include the partials for the forms -->
+    <%- include('Partials/addProfileForm') %>
+    <%- include('Partials/editProfileForm') %>
+    <%- include('Partials/deleteProfilePrompt') %>
+    
+  </main>
+
+  <%- include('Partials/footer') %>
+
+  <script>
+    function addProfile() {
+      document.getElementById('addProfileForm').style.display = 'block';
+    }
+
+    function promptDownload(user_id) {
+      fetch(`/download/${user_id}`, {
+        method: 'POST',
+      }).then(() => {
+        alert(`Download started for user ${user_id}`);
+      })
+    }
+  </script>
+</body>
+</html>

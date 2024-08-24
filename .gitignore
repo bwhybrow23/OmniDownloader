@@ -1,0 +1,12 @@
+# Python
+python/
+
+# Test files
+downloads/
+
+# Data Files
+config.json
+watchlist.json
+
+# Node
+node_modules/
