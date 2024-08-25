@@ -27,7 +27,7 @@
               <td><%= profile.user_id %></td>
               <td><%= profile.platform %></td>
               <td class="action-buttons">
-                <!-- <button onclick="editProfile('<%= profile.user_id %>')">Edit</button> -->
+                <button onclick="window.location.href='/profiles/<%= profile.user_id %>'">View</button>
                 <button onclick="confirmDeleteProfile('<%= profile.user_id %>')">Delete</button>
                 <button onclick="promptDownload('<%= profile.user_id %>')">Download</button>
               </td>
@@ -41,7 +41,6 @@
     
     <!-- Include the partials for the forms -->
     <%- include('Partials/addProfileForm') %>
-    <!-- <%- include('Partials/editProfileForm') %> -->
     <%- include('Partials/deleteProfilePrompt') %>
     
   </main>
