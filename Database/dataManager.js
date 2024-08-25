@@ -2,17 +2,35 @@ import { openDb } from './db.js';
 // import logger from '../Utils/Logger.js';
 
 // Profiles Table
-const getProfiles = async () => {
+export async function getProfiles() {
   const db = await openDb();
-  return db.all(`SELECT * FROM profiles`);
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM profiles', [], (err, rows) => {
+      if (err) {
+        console.error('Error querying profiles:', err);
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
 }
 
-const getProfile = async (platform, user_id) => {
+export async function getProfile(user_id) {
   const db = await openDb();
-  return db.get(`SELECT * FROM profiles WHERE platform = ? AND user_id = ?`, [platform, user_id]);
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM profiles WHERE user_id = ?', [user_id], (err, row) => {
+      if (err) {
+        console.error('Error querying profile:', err);
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
 }
 
-const addProfile = async (platform, user_id, username, media_type) => {
+export async function addProfile(platform, user_id, username, media_type) {
   const db = await openDb();
   return db.run(
     `INSERT INTO profiles (platform, user_id, username, media_type) VALUES (?, ?, ?, ?)`,
@@ -20,7 +38,7 @@ const addProfile = async (platform, user_id, username, media_type) => {
   );
 };
 
-const updateProfile = async (platform, user_id, username, media_type) => {
+export async function updateProfile(platform, user_id, username, media_type) {
   const db = await openDb();
   return db.run(
     `UPDATE profiles SET username = ?, media_type = ? WHERE platform = ? AND user_id = ?`,
@@ -29,12 +47,21 @@ const updateProfile = async (platform, user_id, username, media_type) => {
 }
 
 // Posts Table
-const getPost = async (post_id) => {
+export async function getPost(post_id) {
   const db = await openDb();
-  return db.get(`SELECT * FROM posts WHERE post_id = ?`, [post_id]);
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM posts WHERE post_id = ?', [post_id], (err, row) => {
+      if (err) {
+        console.error('Error querying post:', err);
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
 }
 
-const addPost = async (user_id, post_id, title, content) => {
+export async function addPost(user_id, post_id, title, content) {
   const db = await openDb();
   return db.run(
     `INSERT INTO posts (user_id, post_id, title, content) VALUES (?, ?, ?, ?, ?, ?)`,
@@ -42,7 +69,7 @@ const addPost = async (user_id, post_id, title, content) => {
   );
 };
 
-const updatePost = async (post_id, title, content) => {
+export async function updatePost(post_id, title, content) {
   const db = await openDb();
   return db.run(
     `UPDATE posts SET title = ?, content = ? WHERE post_id = ?`,
@@ -51,12 +78,21 @@ const updatePost = async (post_id, title, content) => {
 }
 
 // Files Table
-const getFiles = async (post_id) => {
+export async function getFiles(post_id) {
   const db = await openDb();
-  return db.all(`SELECT * FROM files WHERE post_id = ?`, [post_id]);
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM files WHERE post_id = ?', [post_id], (err, rows) => {
+      if (err) {
+        console.error('Error querying files:', err);
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
 }
 
-const addFile = async (post_id, file_name, file_path) => {
+export async function addFile(post_id, file_name, file_path) {
   const db = await openDb();
   return db.run(
     `INSERT INTO files (post_id, file_name, file_path) VALUES (?, ?, ?)`,
@@ -64,12 +100,10 @@ const addFile = async (post_id, file_name, file_path) => {
   );
 };
 
-const updateFile = async (file_id, file_name, file_path) => {
+export async function updateFile(file_id, file_name, file_path) {
   const db = await openDb();
   return db.run(
     `UPDATE files SET file_name = ?, file_path = ? WHERE file_id = ?`,
     [file_name, file_path, file_id]
   );
 }
-
-export { getProfiles, getProfile, addProfile, updateProfile, getPost, addPost, updatePost, getFiles, addFile, updateFile };

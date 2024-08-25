@@ -2,9 +2,7 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import https from 'https';
-
 import logger from './Utils/Logger.js';
-import { initDb } from './Database/db.js';
 
 import config from './Data/config.json' with {type: 'json'};
 
@@ -50,8 +48,8 @@ app.use((req, res, next) => {
 });
 
 // Initialize the database
-await initDb();
-logger.info('Database initialized.');
+import { createDbConnection } from './Database/db.js';
+await createDbConnection();
 
 // Start the server
 const PORT = config.port || 3069;
