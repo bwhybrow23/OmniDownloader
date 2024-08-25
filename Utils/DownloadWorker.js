@@ -4,8 +4,9 @@ import os from 'os';
 import path from 'path';
 import { parentPort } from 'worker_threads';
 import logger from './Logger.js';
+import * as Database from '../Utils/Database.js';
 
-export default async function downloadFile({ file, userDir, headers, timeout }) {
+export default async function downloadFile({ file, userDir, post_id, headers, timeout }) {
   const savePath = path.join(userDir, file.name);
 
   if (fs.existsSync(savePath)) {
@@ -60,6 +61,9 @@ export default async function downloadFile({ file, userDir, headers, timeout }) 
       file: file.name,
       success: true
     });
+
+    await Database.addFile(post_id, file.name, savePath);
+
   } catch (error) {
     logger.error(`Failed to download ${file.name}: ${error.message}`);
     if (fs.existsSync(tempFilePath)) {

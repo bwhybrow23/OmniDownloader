@@ -1,5 +1,6 @@
 import axios from 'axios';
 import logger from './Logger.js';
+import * as Database from '../Utils/Database.js';
 
 // Function to fetch new posts for a user
 async function fetchPosts(platform, user_id) {
@@ -66,6 +67,14 @@ async function fetchPosts(platform, user_id) {
 
           // Append post details to posts list
           posts.push({ id: postId, content: postContent });
+
+          // Insert post into database
+          // post title - if empty, send empty string, if not empty, send post.title but remove emojis
+          // post description - if empty, send empty string, if not empty, send post.content but remove emojis
+          let postTitle = post.title ? _removeEmojis(post.title) : '';
+          let postDescription = post.content ? _removeEmojis(post.content) : '';
+          await Database.addPost(user_id, post.id, postTitle, postDescription);
+          
         }
 
         // Output post count
@@ -92,6 +101,12 @@ async function fetchPosts(platform, user_id) {
 
   logger.error(`Max retries reached for URL: ${url}`);
   return posts; // Exit and return fetched posts so far
+}
+
+import emojiRegex from 'emoji-regex';
+let eRegex = emojiRegex();
+function _removeEmojis(text) {
+  return text.replace(eRegex, '');
 }
 
 export { fetchPosts };

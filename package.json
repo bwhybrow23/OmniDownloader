@@ -8,6 +8,7 @@
     "axios": "^1.7.4",
     "body-parser": "^1.20.2",
     "ejs": "^3.1.10",
+    "emoji-regex": "^10.3.0",
     "express": "^4.19.2",
     "multi-progress": "^4.0.0",
     "piscina": "^4.6.1",

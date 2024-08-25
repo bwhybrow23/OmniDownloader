@@ -92,7 +92,7 @@ class Downloader {
     const validFiles = post.content.filter((file) => this._isValidMedia(profile.media_type, path.extname(file.name).slice(1).toLowerCase()));
 
     const downloadPromises = validFiles.map((file) => {
-      return this.piscina.run({ file, userDir: mediaDir, headers: this.headers, timeout: this.timeout });
+      return this.piscina.run({ file, userDir: mediaDir, post_id: post.id, headers: this.headers, timeout: this.timeout });
     });
 
     try {

@@ -218,7 +218,7 @@ export async function getPost(post_id) {
 export async function addPost(user_id, post_id, title, content) {
   const db = await openDb();
   return db.run(
-    `INSERT INTO posts (user_id, post_id, title, content) VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO posts (user_id, post_id, title, content) VALUES (?, ?, ?, ?)`,
     [user_id, post_id, title, content]
   );
 };
