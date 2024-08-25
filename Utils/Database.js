@@ -170,6 +170,43 @@ export async function getProfile(user_id) {
   });
 }
 
+export async function getUserData(user_id) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT
+        profiles.id AS profile_id,
+        profiles.platform,
+        profiles.user_id AS profile_user_id,
+        profiles.username,
+        profiles.media_type,
+        posts.id AS post_id,
+        posts.title,
+        posts.content,
+        files.id AS file_id,
+        files.file_name,
+        files.file_path
+      FROM
+        profiles
+      JOIN
+        posts ON profiles.id = posts.user_id
+      LEFT JOIN
+        files ON posts.id = files.post_id
+      WHERE
+        profiles.user_id = ?
+    `;
+    
+    db.all(query, [user_id], (err, rows) => {
+      if (err) {
+        console.error('Error querying user data:', err);
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
 export async function addProfile(platform, user_id, username, media_type) {
   const db = await openDb();
   return db.run(
