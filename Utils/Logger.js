@@ -2,6 +2,13 @@
 import { createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
 
+import config from '../Data/config.json' with {type: 'json'};
+let logLevel;
+if (config.mode === 'development') {
+  logLevel = 'debug';
+} else if (config.mode === 'production') {
+  logLevel = 'info';
+}
 
 const fileTransport = new transports.DailyRotateFile({
   filename: 'Data/Logs/%DATE%.log',
@@ -19,7 +26,7 @@ const consoleTransport = new transports.Console({
 });
 
 const logger = createLogger({
-  level: 'info',
+  level: logLevel,
   format: format.combine(
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss'
