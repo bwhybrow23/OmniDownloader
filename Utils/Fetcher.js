@@ -39,7 +39,7 @@ async function fetchPosts(platform, user_id) {
           let postContent = [];
 
           // If post files isn't empty, add to post_content
-          if (postFiles) {
+          if (postFiles.length > 0) {
             // If only one object with no array, convert to array
             if (!Array.isArray(postFiles)) {
               postFiles = [postFiles];
@@ -52,7 +52,7 @@ async function fetchPosts(platform, user_id) {
           }
 
           // If post attachments isn't empty, add to post_content
-          if (postAttachments) {
+          if (postAttachments.length > 0) {
             for (const attachment of postAttachments) {
               const content = { name: attachment.name, path: attachment.path };
               postContent.push(content);

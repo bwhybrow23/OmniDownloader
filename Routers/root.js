@@ -1,10 +1,9 @@
 import express from 'express';
 const router = express.Router();
 import logger from '../Utils/Logger.js';
-import { Downloader, downloadPostsConcurrently } from '../Utils/Downloader.js';
+import Downloader from '../Utils/Downloader.js';
 import { fetchPosts } from '../Utils/Fetcher.js';
-
-import watchlist from '../Data/watchlist.json' with {type: 'json'};
+import * as Database from '../Utils/Database.js';
 
 // Home Route
 router.get('/', (req, res) => {
@@ -25,10 +24,13 @@ router.get('/', (req, res) => {
 router.post('/download-all', async (req, res) => {
   const downloader = new Downloader();
 
+  //Get all profiles from the database
+  const watchlist = await Database.getProfiles();
+
   for (const profile of watchlist) {
     try {
       const new_posts = await fetchPosts(profile.platform, profile.user_id);
-      await downloadPostsConcurrently(downloader, new_posts, profile.username, profile.mediaType);
+      await Downloader.downloadPosts(downloader, new_posts, profile);
     } catch (error) {
       console.error(`Failed to download new posts for user ${profile.user_id}`);
     }
@@ -41,11 +43,14 @@ router.post('/download-all', async (req, res) => {
 router.post('/download/:user_id', async (req, res) => {
   const downloader = new Downloader();
 
-  const profile = watchlist.find(profile => profile.user_id === req.params.user_id);
+  if(!req.params.user_id) {
+    return res.status(400).send('User ID is required');
+  }
+  const profile = await Database.getProfile(req.params.user_id);
 
   try {
     const new_posts = await fetchPosts(profile.platform, profile.user_id);
-    await downloadPostsConcurrently(downloader, new_posts, profile.username, profile.mediaType);
+    await downloader.downloadPosts(downloader, new_posts, profile);
   } catch (error) {
     console.error(`Failed to download new posts for user ${profile.user_id}`);
     logger.error(error);

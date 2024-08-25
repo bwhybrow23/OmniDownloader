@@ -1,23 +1,27 @@
 import express from 'express';
 const router = express.Router();
 import fs from 'fs';
-
-import watchlist from '../Data/watchlist.json' with {type: 'json'};
+import * as Database from '../Utils/Database.js';
 
 // Main Page
-router.get('/profiles', (req, res) => {
+router.get('/profiles', async (req, res) => {
+  const watchlist = await Database.getProfiles();
   res.render('profiles', { watchlist });
 });
 
 // Get Profile
-router.get('/profiles/:user_id', (req, res) => {
+router.get('/profiles/:user_id', async (req, res) => {
   const user_id = req.params.user_id;
-  const profile = watchlist.find(p => p.user_id == user_id);
+  if (!user_id) {
+    return res.status(400).send('User ID is required');
+  }
+  
+  const profile = await Database.getProfile(user_id);
   res.json(profile);
 });
 
 // Add Profile
-router.post('/profiles/add', (req, res) => {
+router.post('/profiles/add', async (req, res) => {
   const newProfile = req.body;
 
   // Data Validation
@@ -28,15 +32,17 @@ router.post('/profiles/add', (req, res) => {
     newProfile.username = newProfile.user_id;
   }
 
-  watchlist.push(newProfile);
-  fs.writeFileSync('./Data/watchlist.json', JSON.stringify(watchlist, null, 2));
+  await Database.addProfile(newProfile.platform, newProfile.user_id, newProfile.username, newProfile.media_type);
 
   res.redirect('/profiles');
 });
 
 // Edit Profile
-router.post('/profiles/edit/:user_id', (req, res) => {
+router.post('/profiles/edit/:user_id', async (req, res) => {
   const user_id = req.params.user_id;
+  if (!user_id) {
+    return res.status(400).send('User ID is required');
+  }
   const updatedProfile = req.body;
 
   // Data Validation
@@ -47,19 +53,18 @@ router.post('/profiles/edit/:user_id', (req, res) => {
     updatedProfile.username = updatedProfile.user_id;
   }
 
-  const index = watchlist.findIndex(p => p.user_id == user_id);
-  watchlist[index] = updatedProfile;
-  fs.writeFileSync('./Data/watchlist.json', JSON.stringify(watchlist, null, 2));
+  await Database.updateProfile(updatedProfile.platform, updatedProfile.user_id, updatedProfile.username, updatedProfile.media_type);
 
   res.redirect('/profiles');
 });
 
 // Delete Profile
-router.post('/profiles/delete/:user_id', (req, res) => {
+router.post('/profiles/delete/:user_id', async (req, res) => {
   const user_id = req.params.user_id;
-  const index = watchlist.findIndex(p => p.user_id == user_id);
-  watchlist.splice(index, 1);
-  fs.writeFileSync('./Data/watchlist.json', JSON.stringify(watchlist, null, 2));
+  if (!user_id) {
+    return res.status(400).send('User ID is required');
+  }
+  await Database.deleteProfile(user_id);
 
   res.redirect('/profiles');
 });

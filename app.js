@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 });
 
 // Initialize the database
-import { createDbConnection } from './Database/db.js';
+import { createDbConnection } from './Utils/Database.js';
 await createDbConnection();
 
 // Start the server
