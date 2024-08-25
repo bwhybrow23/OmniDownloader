@@ -3,21 +3,22 @@ const router = express.Router();
 import fs from 'fs';
 import * as Database from '../Utils/Database.js';
 
-// Main Page
+// Get all profiles from the database and display them
 router.get('/profiles', async (req, res) => {
   const watchlist = await Database.getProfiles();
   res.render('profiles', { watchlist });
 });
 
-// Get Profile
+// Get Profile and display it
 router.get('/profiles/:user_id', async (req, res) => {
   const user_id = req.params.user_id;
   if (!user_id) {
     return res.status(400).send('User ID is required');
   }
   
-  const profile = await Database.getProfile(user_id);
-  res.json(profile);
+  // Get the profile from the database, but also get the posts linked to the profile and the files linked to the posts
+  const userData = await Database.getUserData(user_id);
+  res.render('profile', { userData });
 });
 
 // Add Profile
