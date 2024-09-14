@@ -4,7 +4,13 @@ import logger from './Logger.js';
 
 const dbFile = 'Data/db.sqlite';
 
-import watchlist from '/Data/watchlist.json' with { type: 'json' };
+// watchlist.json file (if present)
+let watchlist = [];
+if (fs.existsSync('Data/watchlist.json')) {
+  watchlist = JSON.parse(fs.readFileSync('Data/watchlist.json'));
+} else {
+  logger.debug('No watchlist file found, skipping conversion.');
+}
 
 // Create database connection (connect if existing, create if not)
 export async function createDbConnection() {
