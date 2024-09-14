@@ -3,10 +3,10 @@
 ## Database
 [X] Create a database schema for the project
 [X] Create the database manager (with functions)
-[ ] Import pre-existing data from watchlist.json into the database
+[X] Import pre-existing data from watchlist.json into the database
 
 ## Downloader
-[ ] Test the downloader works concurrently
+[X] Test the downloader works concurrently
 [ ] Implement a way to track downloads for the front-end
 [ ] Generate NFO files for each file downloaded for Jellyfin
 
