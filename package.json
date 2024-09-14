@@ -5,7 +5,7 @@
   "exports": "./app.js",
   "type": "module",
   "dependencies": {
-    "axios": "^1.7.4",
+    "axios": "^1.7.7",
     "body-parser": "^1.20.2",
     "ejs": "^3.1.10",
     "emoji-regex": "^10.3.0",
