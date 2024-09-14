@@ -1,9 +1,0 @@
-{
-  "mode": "development",
-  "port": 3069,
-  "BASE_DIR": "downloads",
-  "LOG_DIR": "logs",
-  "separate_folders": true,
-  "image_folder": "Images",
-  "video_folder": "Videos"
-}
