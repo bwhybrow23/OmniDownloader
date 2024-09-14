@@ -1,13 +1,6 @@
-# Python
-python/
-
-# Test files
-downloads/
-
-# Data Files
-config.json
-watchlist.json
-db.sqlite
-
 # Node
-node_modules/
+node_modules
+
+# Running files
+Data/
+downloads/
