@@ -39,6 +39,16 @@
   </main>
 
   <%- include('Partials/footer') %>
+
+  <script>
+    function downloadAll() {
+      fetch(`/download-all`, {
+        method: 'POST',
+      }).then(() => {
+        alert(`Download started for all users.`);
+      })
+    }
+  </script>
   
   </body>
 </html>

@@ -30,9 +30,9 @@ router.post('/download-all', async (req, res) => {
   for (const profile of watchlist) {
     try {
       const new_posts = await fetchPosts(profile.platform, profile.user_id);
-      await Downloader.downloadPosts(downloader, new_posts, profile);
+      await downloader.downloadPosts(downloader, new_posts, profile);
     } catch (error) {
-      console.error(`Failed to download new posts for user ${profile.user_id}`);
+      logger.error(`Failed to download new posts for user ${profile.user_id}:`, error);
     }
   }
 
@@ -52,8 +52,7 @@ router.post('/download/:user_id', async (req, res) => {
     const new_posts = await fetchPosts(profile.platform, profile.user_id);
     await downloader.downloadPosts(downloader, new_posts, profile);
   } catch (error) {
-    console.error(`Failed to download new posts for user ${profile.user_id}`);
-    logger.error(error);
+    logger.error(`Failed to download new posts for user ${profile.user_id}:`, error);
   }
 
   res.redirect('/profiles');

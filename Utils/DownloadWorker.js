@@ -53,19 +53,19 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
       await fs.promises.unlink(tempFilePath);
     } else {
       await fs.promises.rename(tempFilePath, savePath);
-      logger.info(`Downloaded: ${savePath}`);
     }
 
     parentPort.postMessage({
       type: 'done',
       file: file.name,
+      path: savePath,
       success: true
     });
 
     await Database.addFile(post_id, file.name, savePath);
 
   } catch (error) {
-    logger.error(`Failed to download ${file.name}: ${error.message}`);
+    logger.error(`Failed to download ${file.name}:`. error);
     if (fs.existsSync(tempFilePath)) {
       await fs.promises.unlink(tempFilePath);
     }
@@ -73,6 +73,7 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
     parentPort.postMessage({
       type: 'done',
       file: file.name,
+      path: savePath,
       success: false,
       error: error.message
     });

@@ -88,12 +88,11 @@ async function fetchPosts(platform, user_id) {
     } catch (error) {
       if (error.response && error.response.status === 429) {
         const waitTime = initialWaitTime * (2 ** retries); // Exponential backoff
-        logger.error(`Too Many Requests: ${error.message}`);
-        logger.info(`Waiting for ${waitTime / 1000} seconds before retrying...`);
+        logger.debug(`Too Many Requests: Waiting for ${waitTime / 1000} seconds before retrying...`);
         await setTimeout(waitTime);
         retries += 1;
       } else {
-        logger.error(`Request failed: ${error.message}`);
+        logger.error(`Request failed:`, error);
         return posts; // Exit and return fetched posts so far
       }
     }
