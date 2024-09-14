@@ -4,7 +4,7 @@ import logger from './Logger.js';
 
 const dbFile = 'Data/db.sqlite';
 
-import watchlist from '../Data/watchlist.json' with { type: 'json' };
+import watchlist from '/Data/watchlist.json' with { type: 'json' };
 
 // Create database connection (connect if existing, create if not)
 export async function createDbConnection() {
@@ -147,7 +147,7 @@ export async function getProfiles() {
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM profiles', [], (err, rows) => {
       if (err) {
-        console.error('Error querying profiles:', err);
+        logger.error('Error querying profiles:', err);
         reject(err);
       } else {
         resolve(rows);
@@ -161,7 +161,7 @@ export async function getProfile(user_id) {
   return new Promise((resolve, reject) => {
     db.get('SELECT * FROM profiles WHERE user_id = ?', [user_id], (err, row) => {
       if (err) {
-        console.error('Error querying profile:', err);
+        logger.error('Error querying profile:', err);
         reject(err);
       } else {
         resolve(row);
@@ -198,7 +198,7 @@ export async function getUserData(user_id) {
     
     db.all(query, [user_id], (err, rows) => {
       if (err) {
-        console.error('Error querying user data:', err);
+        logger.error('Error querying user data:', err);
         reject(err);
       } else {
         resolve(rows);
@@ -243,7 +243,7 @@ export async function getPost(post_id) {
   return new Promise((resolve, reject) => {
     db.get('SELECT * FROM posts WHERE post_id = ?', [post_id], (err, row) => {
       if (err) {
-        console.error('Error querying post:', err);
+        logger.error('Error querying post:', err);
         reject(err);
       } else {
         resolve(row);
@@ -279,7 +279,7 @@ export async function getFiles(post_id) {
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM files WHERE post_id = ?', [post_id], (err, rows) => {
       if (err) {
-        console.error('Error querying files:', err);
+        logger.error('Error querying files:', err);
         reject(err);
       } else {
         resolve(rows);

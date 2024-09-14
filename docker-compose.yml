@@ -1,0 +1,18 @@
+services:
+  omnidownloader:
+    image: omnidownloader:latest
+    container_name: omnidownloader
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+      - DEBUG=false
+      - SEPARATE_FOLDERS=true
+      - IMAGE_FOLDER=images
+      - VIDEO_FOLDER=videos
+    volumes:
+      - ./Data:/Data # Configuration files
+      - ./downloads:/downloads # Downloaded files
+    ports:
+      - "6969:6969"
+    network_mode: bridge

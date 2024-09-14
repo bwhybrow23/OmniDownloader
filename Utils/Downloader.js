@@ -4,8 +4,6 @@ import logger from './Logger.js';
 import { Piscina } from 'piscina';
 import MultiProgress from 'multi-progress';
 
-import config from '../Data/config.json' with {type: 'json'};
-
 // Downloader class for handling media downloads
 class Downloader {
   constructor(maxRetries = 6, initialWaitTime = 10, timeout = 30000, downloadConcurrency = 3) {
@@ -47,9 +45,9 @@ class Downloader {
 
       if (message.type === 'done') {
         if (message.success) {
-          console.log(`Download completed: ${message.file}`);
+          logger.info(`Download completed: ${message.path}`);
         } else {
-          console.error(`Download failed: ${message.file}, error: ${message.error}`);
+          logger.error(`Download failed: ${message.path} - `, message.error);
         }
 
         // Optionally, remove the progress bar after completion
@@ -66,7 +64,7 @@ class Downloader {
       try {
         await downloader.downloadPost(post, profile);
       } catch (error) {
-        logger.error(`Failed to download post ${post.id}: ${error.message}`);
+        logger.error(`Failed to download post ${post.id}:`, error);
       }
     }
 
@@ -78,11 +76,11 @@ class Downloader {
     logger.debug(`Downloading post: ${post.id}.`);
 
     // Define the user's directory
-    const userDir = path.join(config.BASE_DIR, profile.username);
+    const userDir = path.join(import.meta.dirname, 'downloads', profile.username); 
     let mediaDir;
 
-    if (config.SEPARATE_FOLDERS) {
-      mediaDir = path.join(userDir, profile.media_type === 'photos' ? config.IMAGE_FOLDER : config.VIDEO_FOLDER);
+    if (process.env.SEPARATE_FOLDERS) {
+      mediaDir = path.join(userDir, profile.media_type === 'photos' ? process.env.IMAGE_FOLDER : process.env.VIDEO_FOLDER);
     } else {
       mediaDir = userDir;
     }
@@ -98,7 +96,7 @@ class Downloader {
     try {
       await Promise.all(downloadPromises);
     } catch (error) {
-      logger.error(`Error downloading files for post ${post.id}: ${error.message}`);
+      logger.error(`Error downloading files for post ${post.id}:`, error);
     }
 
     logger.debug('Completed processing all media links for the post.');

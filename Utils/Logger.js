@@ -2,11 +2,10 @@
 import { createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
 
-import config from '../Data/config.json' with {type: 'json'};
 let logLevel;
-if (config.mode === 'development') {
+if (process.env.DEBUG === 'true') {
   logLevel = 'debug';
-} else if (config.mode === 'production') {
+} else if (process.env.DEBUG === 'false') {
   logLevel = 'info';
 }
 

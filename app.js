@@ -4,8 +4,6 @@ import bodyParser from 'body-parser';
 import https from 'https';
 import logger from './Utils/Logger.js';
 
-import config from './Data/config.json' with {type: 'json'};
-
 const app = express();
 
 // Set view engine
@@ -52,7 +50,7 @@ import { createDbConnection } from './Utils/Database.js';
 await createDbConnection();
 
 // Start the server
-const PORT = config.port || 3069;
+const PORT = 6969;
 app.listen(PORT, () => {
     logger.info(`Server is running on port ${PORT}`);
 });
