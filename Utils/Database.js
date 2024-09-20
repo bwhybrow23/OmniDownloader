@@ -6,8 +6,8 @@ const dbFile = 'Data/db.sqlite';
 
 // watchlist.json file (if present)
 let watchlist = [];
-if (fs.existsSync('Data/watchlist.json')) {
-  watchlist = JSON.parse(fs.readFileSync('Data/watchlist.json'));
+if (fs.existsSync('/Data/watchlist.json')) {
+  watchlist = JSON.parse(fs.readFileSync('/Data/watchlist.json'));
 } else {
   logger.debug('No watchlist file found, skipping conversion.');
 }
@@ -16,8 +16,23 @@ if (fs.existsSync('Data/watchlist.json')) {
 export async function createDbConnection() {
   if (fs.existsSync(dbFile)) {
     logger.debug('Database file already exists, so using that file.');
+    const db = new sqlite3.Database(dbFile, (err) => {
+      if (err) {
+        return logger.error(`Error opening database file:`, err);
+      }
+
+      // Enable WAL mode
+      db.exec('PRAGMA journal_mode = WAL;', (error) => {
+        if (error) {
+          return logger.error('Error setting WAL mode:', error);
+        } else {
+          logger.info('WAL mode enabled.');
+        }
+      });
+    });
+
     logger.info('Database initialized.');
-    return new sqlite3.Database(dbFile);
+    return db;
   } else {
     logger.debug('Database file does not exist, so creating a new file.');
     const db = new sqlite3.Database(dbFile, async (error) => {
@@ -26,6 +41,15 @@ export async function createDbConnection() {
       }
 
       logger.debug('Database file created successfully.');
+
+      // Enable WAL mode
+      db.exec('PRAGMA journal_mode = WAL;', (error) => {
+        if (error) {
+          return logger.error('Error setting WAL mode:', error);
+        } else {
+          logger.info('WAL mode enabled.');
+        }
+      });
 
       // Create tables
       await _createTables(db);

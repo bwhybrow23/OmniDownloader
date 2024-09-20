@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import logger from './Logger.js';
 import { Piscina } from 'piscina';
-import MultiProgress from 'multi-progress';
 
 // Downloader class for handling media downloads
 class Downloader {
@@ -17,30 +16,31 @@ class Downloader {
     };
     this.piscina = new Piscina({ filename: new URL('./DownloadWorker.js', import.meta.url).href, maxThreads: this.downloadConcurrency });
 
-    // Initialize multi-progress to manage multiple progress bars
-    this.multi = new MultiProgress(process.stderr);
-    this.progressBars = new Map();
+    //Check permissions
+    fs.access('/downloads', fs.constants.W_OK, (err) => {
+      if (err) {
+        logger.debug('No access to /downloads folder, will try to rectify this.');
+        if(!fs.existsSync('/downloads')) {
+          fs.mkdirSync('/downloads', { recursive: true });
+        }
+        fs.chmod('/downloads', '777', (err) => {
+          if (err) {
+            logger.error('Could not change permissions for /downloads folder.');
+          }
+        });
+      } else {
+        logger.debug('Access to /downloads folder is OK.');
+      }
+    });
 
     // Listen to messages from worker threads
     this.piscina.on('message', (message) => {
       if (message.type === 'progress') {
         const { file, downloadedSize, totalSize } = message;
 
-        // Check if a progress bar already exists for this file
-        if (!this.progressBars.has(file)) {
-          // Create a new progress bar for this file using multi-progress
-          const progressBar = this.multi.newBar(`Downloading ${file} [:bar] :percent :etas`, {
-            complete: '=',
-            incomplete: ' ',
-            width: 20,
-            total: totalSize,
-          });
-          this.progressBars.set(file, progressBar);
-        }
+        // Display console updates for download progress
+        logger.debug(`Downloading ${file}: ${this._bytesToSize(downloadedSize)} / ${this._bytesToSize(totalSize)}`);
 
-        // Update the progress bar with the latest data
-        const progressBar = this.progressBars.get(file);
-        progressBar.tick(downloadedSize - progressBar.curr);
       }
 
       if (message.type === 'done') {
@@ -49,10 +49,8 @@ class Downloader {
         } else {
           logger.error(`Download failed: ${message.path} - `, message.error);
         }
-
-        // Optionally, remove the progress bar after completion
-        this.progressBars.delete(message.file);
       }
+
     });
   }
 
@@ -76,11 +74,21 @@ class Downloader {
     logger.debug(`Downloading post: ${post.id}.`);
 
     // Define the user's directory
-    const userDir = path.join(import.meta.dirname, 'downloads', profile.username); 
+    const userDir = path.join('/downloads', profile.username); 
     let mediaDir;
 
     if (process.env.SEPARATE_FOLDERS) {
-      mediaDir = path.join(userDir, profile.media_type === 'photos' ? process.env.IMAGE_FOLDER : process.env.VIDEO_FOLDER);
+      if(profile.media_type === 'all') {
+        // determine whether the file is an image or video
+        const fileExtension = path.extname(post.content[0].name).slice(1).toLowerCase();
+        mediaDir = path.join(userDir, this._isValidMedia('photos', fileExtension) ? process.env.IMAGE_FOLDER : process.env.VIDEO_FOLDER);
+      } else if (profile.media_type === 'photos') {
+        mediaDir = path.join(userDir, process.env.IMAGE_FOLDER);
+      } else if (profile.media_type === 'videos') {
+        mediaDir = path.join(userDir, process.env.VIDEO_FOLDER);
+      } else {
+        mediaDir = userDir;
+      }
     } else {
       mediaDir = userDir;
     }
@@ -119,6 +127,14 @@ class Downloader {
     }
 
     return false;
+  }
+
+  _bytesToSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+    if (bytes === 0) return 'n/a'
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
+    if (i === 0) return `${bytes} ${sizes[i]})`
+    return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
   }
 }
 

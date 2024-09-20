@@ -3,13 +3,13 @@ services:
     image: omnidownloader:latest
     container_name: omnidownloader
     environment:
-      - DEBUG=false
+      - DEBUG=true
       - SEPARATE_FOLDERS=true
       - IMAGE_FOLDER=images
       - VIDEO_FOLDER=videos
     volumes:
-      - ./Data:/Data # Configuration files
-      - ./downloads:/downloads # Downloaded files
+      - ./Data:/Data:rw # Configuration files
+      - ./downloads:/downloads:rw # Downloaded files
     ports:
       - "6969:6969"
     network_mode: bridge

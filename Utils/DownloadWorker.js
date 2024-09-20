@@ -5,9 +5,15 @@ import path from 'path';
 import { parentPort } from 'worker_threads';
 import logger from './Logger.js';
 import * as Database from '../Utils/Database.js';
+import mv from 'mv';
+
+function _sanitizeFilename(filename) {
+  return filename.replace(/[^a-zA-Z0-9-_\.]/g, '_');
+}
 
 export default async function downloadFile({ file, userDir, post_id, headers, timeout }) {
-  const savePath = path.join(userDir, file.name);
+  const sanitizedFilename = _sanitizeFilename(file.name);
+  const savePath = path.join(userDir, sanitizedFilename);
 
   if (fs.existsSync(savePath)) {
     logger.debug(`File ${savePath} already exists. Skipping download.`);
@@ -52,7 +58,11 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
       logger.error(`Download incomplete: ${file.name}`);
       await fs.promises.unlink(tempFilePath);
     } else {
-      await fs.promises.rename(tempFilePath, savePath);
+      mv(tempFilePath, savePath, (err) => {
+        if (err) {
+          logger.error(`Failed to move ${tempFilePath} to ${savePath}:`, err);
+        }
+      });
     }
 
     parentPort.postMessage({
