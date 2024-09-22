@@ -8,8 +8,8 @@ services:
       - IMAGE_FOLDER=images
       - VIDEO_FOLDER=videos
     volumes:
-      - ./Data:/Data:rw # Configuration files
-      - ./downloads:/downloads:rw # Downloaded files
+      - /srv/OmniDownloader/Data:/srv/OmniDownloader/Data:rw # Configuration files
+      - /srv/OmniDownloader/downloads:/srv/OmniDownloader/downloads:rw # Downloaded files
     ports:
       - "6969:6969"
     network_mode: bridge
