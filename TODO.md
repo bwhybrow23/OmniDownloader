@@ -7,16 +7,15 @@
 
 ## Downloader
 [X] Test the downloader works concurrently
-[ ] Implement a way to track downloads for the front-end
+[X] Implement a way to track downloads for the front-end
 [ ] Generate NFO files for each file downloaded for Jellyfin
 
-
 ## Misc Backend
-[ ] Add Docker compatibility
-[ ] Change how the config is stored to be more versatile (possibly stored in the downloads folder alongside the logs)
+[X] Add Docker compatibility
+[X] Change how the config is stored to be more versatile (possibly stored in the downloads folder alongside the logs)
 
 ## Front End
-[ ] Profiles page (watchlist)
+[X] Profiles page (watchlist)
 [ ] Posts page (for each profile)
 [ ] Improve the UI look
 
