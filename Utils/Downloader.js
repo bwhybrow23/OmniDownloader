@@ -33,22 +33,37 @@ class Downloader {
       }
     });
 
+    // Download tracking JSON file (check if it exists)
+    let trackingFile = [];
+    if (fs.existsSync('/srv/OmniDownloader/Data/downloads.json')) {
+      // If exists, wipe the file
+      fs.writeFileSync('/srv/OmniDownloader/Data/downloads.json', JSON.stringify(trackingFile, null, 2));
+    } else {
+      // If doesn't exist, create the file
+      fs.writeFileSync('/srv/OmniDownloader/Data/downloads.json', JSON.stringify(trackingFile, null, 2));
+    }
+
     // Listen to messages from worker threads
     this.piscina.on('message', (message) => {
       if (message.type === 'progress') {
-        const { file, downloadedSize, totalSize } = message;
+        const { file, downloadedSize, totalSize, profile } = message;
+
+        this._trackDownload({ "file": file, "downloadedSize": this._bytesToSize(downloadedSize), "totalSize": this._bytesToSize(totalSize), "profile": profile });
 
         // Display console updates for download progress
-        logger.debug(`Downloading ${file}: ${this._bytesToSize(downloadedSize)} / ${this._bytesToSize(totalSize)}`);
+        logger.debug(`${profile}: Downloading ${file}: ${this._bytesToSize(downloadedSize)} / ${this._bytesToSize(totalSize)}`);
 
       }
 
       if (message.type === 'done') {
+        this._removeFromTracking(message.file);
+
         if (message.success) {
           logger.info(`Download completed: ${message.path}`);
         } else {
           logger.error(`Download failed: ${message.path} - `, message.error);
         }
+
       }
 
     });
@@ -98,7 +113,7 @@ class Downloader {
     const validFiles = post.content.filter((file) => this._isValidMedia(profile.media_type, path.extname(file.name).slice(1).toLowerCase()));
 
     const downloadPromises = validFiles.map((file) => {
-      return this.piscina.run({ file, userDir: mediaDir, post_id: post.id, headers: this.headers, timeout: this.timeout });
+      return this.piscina.run({ file, userDir: mediaDir, post_id: post.id, headers: this.headers, timeout: this.timeout, profile: profile });
     });
 
     try {
@@ -135,6 +150,27 @@ class Downloader {
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
+  }
+
+  // Download tracking
+  async _trackDownload(download) {
+    const trackingFile = JSON.parse(fs.readFileSync('/srv/OmniDownloader/Data/downloads.json'));
+    // check if the file is already being tracked
+    const index = trackingFile.findIndex((item) => item.file === download.file);
+    if (index !== -1) {
+      trackingFile[index] = download;
+    } else {
+      trackingFile.push(download);
+    }
+    fs.writeFileSync('/srv/OmniDownloader/Data/downloads.json', JSON.stringify(trackingFile, null, 2));
+  }
+  
+  // Remove from tracking
+  async _removeFromTracking(file) {
+    const trackingFile = JSON.parse(fs.readFileSync('/srv/OmniDownloader/Data/downloads.json'));
+    const index = trackingFile.findIndex((item) => item.file === file);
+    trackingFile.splice(index, 1);
+    fs.writeFileSync('/srv/OmniDownloader/Data/downloads.json', JSON.stringify(trackingFile, null, 2));
   }
 }
 

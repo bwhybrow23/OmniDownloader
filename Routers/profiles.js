@@ -6,6 +6,9 @@ import * as Database from '../Utils/Database.js';
 // Get all profiles from the database and display them
 router.get('/profiles', async (req, res) => {
   const watchlist = await Database.getProfiles();
+  watchlist.sort((a, b) => {
+    return a.username.localeCompare(b.username);
+  });
   res.render('profiles', { watchlist });
 });
 

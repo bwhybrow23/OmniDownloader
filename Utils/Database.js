@@ -6,8 +6,8 @@ const dbFile = 'Data/db.sqlite';
 
 // watchlist.json file (if present)
 let watchlist = [];
-if (fs.existsSync('/Data/watchlist.json')) {
-  watchlist = JSON.parse(fs.readFileSync('/Data/watchlist.json'));
+if (fs.existsSync('/srv/OmniDownloader/Data/watchlist.json')) {
+  watchlist = JSON.parse(fs.readFileSync('/srv/OmniDownloader/Data/watchlist.json'));
 } else {
   logger.debug('No watchlist file found, skipping conversion.');
 }

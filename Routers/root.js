@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 const router = express.Router();
 import logger from '../Utils/Logger.js';
 import Downloader from '../Utils/Downloader.js';
@@ -7,12 +8,21 @@ import * as Database from '../Utils/Database.js';
 
 // Home Route
 router.get('/', (req, res) => {
+  // Read the download tracking file
+  let trackingFile = [];
+  if (fs.existsSync('/srv/OmniDownloader/Data/downloads.json')) {
+    // read the file
+    trackingFile = JSON.parse(fs.readFileSync('/srv/OmniDownloader/Data/downloads.json'));
+  } else {
+    // display dummy data if the file doesn't exist
+    trackingFile = [
+      { "file": " ", "downloadedSize": "0 MB", "totalSize": "0 MB", "profile": "No downloads in progress." }
+    ]
+  }
+
   res.render('index', { 
     title: 'Dashboard',
-    downloads: [
-      { profileName: 'User1', contentType: 'Image', status: 'Completed' },
-      { profileName: 'User2', contentType: 'Video', status: 'Downloading' }
-    ],
+    downloads: trackingFile,
     recentActivities: [
       { message: 'Downloaded content for User1', time: '10:00 AM' },
       { message: 'Profile User2 added', time: '9:00 AM' }

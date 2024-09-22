@@ -11,7 +11,7 @@ function _sanitizeFilename(filename) {
   return filename.replace(/[^a-zA-Z0-9-_\.]/g, '_');
 }
 
-export default async function downloadFile({ file, userDir, post_id, headers, timeout }) {
+export default async function downloadFile({ file, userDir, post_id, headers, timeout, profile }) {
   const sanitizedFilename = _sanitizeFilename(file.name);
   const savePath = path.join(userDir, sanitizedFilename);
 
@@ -36,15 +36,21 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
     const totalSize = parseInt(response.headers['content-length'], 10);
     const writer = fs.createWriteStream(tempFilePath);
     let downloadedSize = 0;
+    let lastReportedTime = Date.now();
 
     response.data.on('data', (chunk) => {
       downloadedSize += chunk.length;
-      parentPort.postMessage({
-        type: 'progress',
-        file: file.name,
-        downloadedSize,
-        totalSize
-      });
+      const currentTime = Date.now();
+      if (currentTime - lastReportedTime >= 1000) { // Report progress every second
+        parentPort.postMessage({
+          type: 'progress',
+          file: file.name,
+          downloadedSize,
+          totalSize,
+          profile: profile.username
+        });
+        lastReportedTime = currentTime;
+      }
     });
 
     response.data.pipe(writer);
@@ -69,13 +75,14 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
       type: 'done',
       file: file.name,
       path: savePath,
+      profile: profile.username,
       success: true
     });
 
     await Database.addFile(post_id, file.name, savePath);
 
   } catch (error) {
-    logger.error(`Failed to download ${file.name}:`. error);
+    logger.error(`Failed to download ${file.name}:`, error);
     if (fs.existsSync(tempFilePath)) {
       await fs.promises.unlink(tempFilePath);
     }
@@ -84,6 +91,7 @@ export default async function downloadFile({ file, userDir, post_id, headers, ti
       type: 'done',
       file: file.name,
       path: savePath,
+      profile: profile.username,
       success: false,
       error: error.message
     });

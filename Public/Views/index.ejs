@@ -15,9 +15,8 @@
       <div class="downloads">
         <% downloads.forEach(function(download) { %>
           <div class="download-item">
-            <h3><%= download.profileName %></h3>
-            <p>Content Type: <%= download.contentType %></p>
-            <p>Status: <span class="<%= download.status.toLowerCase() %>"><%= download.status %></span></p>
+            <h3><%= download.profile %> - <%= download.file %></h3>
+            <p>Downloaded: <%= download.downloadedSize %> / <%= download.totalSize %></p>
           </div>
         <% }); %>
       </div>
