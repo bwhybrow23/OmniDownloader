@@ -9,7 +9,7 @@
     "body-parser": "^1.20.3",
     "ejs": "^3.1.10",
     "emoji-regex": "^10.4.0",
-    "express": "^4.21.0",
+    "express": "^4.21.1",
     "multi-progress": "^4.0.0",
     "mv": "^2.1.1",
     "piscina": "^4.7.0",
