@@ -2,6 +2,11 @@
 
 All notable changes to OmniDownloader will be documented in this file. 
 
+## [2.0.0] - 2024-11-02
+### Changed
+- Moved the frontend to React (client folder)
+- Moved the backend to Express (server folder)
+
 ## [1.0.0] - 2024-09-22
 Initial Commit
 ### Added

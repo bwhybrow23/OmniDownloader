@@ -1,6 +1,8 @@
 services:
   omnidownloader-backend:
-    image: omnidownloader:latest
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
     container_name: omnidownloader-backend
     environment:
       - DEBUG=true
@@ -8,8 +10,8 @@ services:
       - IMAGE_FOLDER=images
       - VIDEO_FOLDER=videos
     volumes:
-      - /mnt/c/Users/stent/Documents/Coding/OmniDownloader/Data:/srv/OmniDownloader/Data:rw
-      - /mnt/c/Users/stent/Documents/Coding/OmniDownloader/downloads:/srv/OmniDownloader/downloads:rw
+      - ./server:/srv/OmniDownloader  # Mount the entire backend codebase for live reloading
+      - /srv/OmniDownloader/node_modules  # Avoids overwriting node_modules with the host
     ports:
       - "6969:6969"
     networks:
@@ -18,19 +20,15 @@ services:
   omnidownloader-frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     container_name: omnidownloader-frontend
     environment:
       - PUBLIC_URL=/
+    command: ["npm", "start"]
     volumes:
-      - ./client/build:/app/build
+      - ./client:/srv/client
+      - /srv/client/node_modules  # Avoids overwriting node_modules with the host
     ports:
       - "3000:3000"
     networks:
       - omnidownloader
-    depends_on:
-      - omnidownloader-backend
-
-networks:
-  omnidownloader:
-    driver: bridge

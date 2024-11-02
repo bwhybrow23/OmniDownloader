@@ -3,6 +3,7 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import https from 'https';
 import logger from './Utils/Logger.js';
+import cors from 'cors';
 
 const app = express();
 
@@ -14,6 +15,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(import.meta.dirname, 'Public/Assets')));
 app.set('views', path.join(import.meta.dirname, 'Public/Views'));
+
+// CORS
+app.use(cors());
 
 // HTTP CATS
 function httpCatsMiddleware(req, res, next) {
